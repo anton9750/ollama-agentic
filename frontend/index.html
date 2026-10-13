@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111318">
+  <meta name="description" content="Agentic AI — your local AI assistant powered by Ollama.">
+  <title>Agentic AI — Local Assistant</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a class="brand" href="./">
+          <span class="brand-icon">✳</span>
+          <span>Agentic AI</span>
+        </a>
+        <button class="icon-button mobile-close" id="closeSidebar" type="button" aria-label="Close sidebar">×</button>
+      </div>
+
+      <button class="new-chat-button" id="newChatButton" type="button">
+        <span>＋</span> New chat
+      </button>
+
+      <div class="sidebar-section">
+        <p class="section-label">YOUR AI</p>
+        <div class="sidebar-info">
+          <span class="status-dot" id="sidebarStatusDot"></span>
+          <div class="sidebar-info-text">
+            <strong>Local companion</strong>
+            <span id="sidebarStatusText">Checking connection…</span>
+          </div>
+        </div>
+        <div class="sidebar-info">
+          <span class="sidebar-symbol">⌘</span>
+          <div class="sidebar-info-text">
+            <strong>Local models</strong>
+            <span>Powered by Ollama</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <p class="section-label">GET STARTED</p>
+        <a class="sidebar-link" href="https://ollama.com/download" target="_blank" rel="noopener noreferrer">
+          <span>↓</span> Install Ollama
+        </a>
+        <a class="sidebar-link" href="https://github.com/YOUR-USERNAME/YOUR-REPOSITORY/releases/latest" target="_blank" rel="noopener noreferrer">
+          <span>▣</span> Download Windows app
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="privacy-note">
+          <span>🔒</span>
+          <div>
+            <strong>Local-first AI</strong>
+            <p>Chat requests go to your local companion.</p>
+          </div>
+        </div>
+        <a class="footer-link" href="#help">Connection help</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" id="openSidebar" type="button" aria-label="Open sidebar">☰</button>
+          <div class="mobile-brand"><span class="brand-icon">✳</span> Agentic AI</div>
+          <div class="page-title">
+            <strong>Local Assistant</strong>
+            <span class="topbar-subtitle">Your AI, on your computer</span>
+          </div>
+        </div>
+
+        <div class="connection-badge" id="connectionBadge" role="status">
+          <span class="status-dot" id="connectionDot"></span>
+          <span id="connectionText">Checking connection…</span>
+        </div>
+      </header>
+
+      <section class="chat-area" aria-label="Conversation">
+        <div class="welcome" id="welcomeScreen">
+          <div class="welcome-icon">✳</div>
+          <h1>What can I help you with?</h1>
+          <p class="welcome-description">
+            Chat with an AI model running on your computer using Ollama.
+          </p>
+
+          <div class="suggestion-grid">
+            <button class="suggestion-card" type="button" data-prompt="Explain how my local AI assistant works.">
+              <span class="suggestion-icon">⌘</span>
+              <span><strong>Understand your AI</strong><small>Explore your agent system</small></span>
+            </button>
+            <button class="suggestion-card" type="button" data-prompt="Help me write and debug Python code.">
+              <span class="suggestion-icon">{ }</span>
+              <span><strong>Write some code</strong><small>Build, explain or debug</small></span>
+            </button>
+            <button class="suggestion-card" type="button" data-prompt="Give me five creative ideas for improving my local AI assistant.">
+              <span class="suggestion-icon">✧</span>
+              <span><strong>Explore ideas</strong><small>Discover useful features</small></span>
+            </button>
+            <button class="suggestion-card" type="button" data-prompt="Help me plan a project step by step.">
+              <span class="suggestion-icon">☷</span>
+              <span><strong>Plan a project</strong><small>Turn an idea into steps</small></span>
+            </button>
+          </div>
+
+          <div class="setup-callout">
+            <span>ⓘ</span>
+            <div>
+              <strong>First time here?</strong>
+              <p>Install Ollama, download a model, then launch your Windows companion app.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="messages" id="messages" aria-live="polite" aria-label="Chat messages" hidden></div>
+      </section>
+
+      <section class="composer-section">
+        <div class="error-banner" id="errorBanner" role="alert" hidden>
+          <span id="errorMessage"></span>
+          <button id="dismissError" type="button" aria-label="Dismiss error">×</button>
+        </div>
+
+        <form class="composer" id="chatForm">
+          <label class="visually-hidden" for="messageInput">Message your local AI</label>
+          <textarea id="messageInput" name="message" placeholder="Message your local AI…" rows="1" maxlength="10000" required></textarea>
+          <div class="composer-toolbar">
+            <div class="composer-hint">
+              <span class="local-indicator"></span>
+              <span>Local companion</span>
+              <span class="hint-divider">·</span>
+              <span>Enter to send, Shift+Enter for a new line</span>
+            </div>
+            <button class="send-button" id="sendButton" type="submit" aria-label="Send message">↑</button>
+          </div>
+        </form>
+        <p class="disclaimer">AI responses can be inaccurate. Check important information.</p>
+      </section>
+
+      <section class="help-section" id="help">
+        <details>
+          <summary>Can't connect to your local AI?</summary>
+          <ol>
+            <li>Make sure Ollama is running and a model is installed.</li>
+            <li>Launch the companion app and keep it open.</li>
+            <li>Open the website from the companion's browser window.</li>
+            <li>If it still fails, inspect the browser console and companion terminal.</li>
+          </ol>
+          <p>The website cannot install software or start Ollama on its own.</p>
+        </details>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
