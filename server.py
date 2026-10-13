@@ -1,6 +1,7 @@
 
 import os
 import secrets
+import sys
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException
@@ -9,10 +10,35 @@ from pydantic import BaseModel, Field
 
 from team import Runtime
 
-# Project directory
-ROOT = Path(__file__).resolve().parent
 
-# The launcher must set this before importing server.py.
+# --------------------------------------------------
+# Application and data paths
+# --------------------------------------------------
+
+if getattr(sys, "frozen", False):
+    # Bundled read-only resources
+    RESOURCE_ROOT = Path(sys._MEIPASS).resolve()
+else:
+    # Project directory during development
+    RESOURCE_ROOT = Path(__file__).resolve().parent
+
+# Writable location for memory, history, and generated output
+DATA_ROOT = Path(
+    os.environ.get("AGENTIC_DATA_DIR", str(RESOURCE_ROOT))
+).resolve()
+
+DATA_ROOT.mkdir(parents=True, exist_ok=True)
+
+# Make bundled configuration and resource files available to Runtime.
+# Runtime currently uses one root for both resources and writable data.
+# Keep RESOURCE_ROOT here until we update Runtime to separate those paths.
+ROOT = RESOURCE_ROOT
+
+
+# --------------------------------------------------
+# Security
+# --------------------------------------------------
+
 LOCAL_TOKEN = os.environ.get("LOCAL_COMPANION_TOKEN")
 
 if not LOCAL_TOKEN:
@@ -21,10 +47,13 @@ if not LOCAL_TOKEN:
         "Start the app using launcher.py instead of server.py."
     )
 
+
+# --------------------------------------------------
+# FastAPI application
+# --------------------------------------------------
+
 app = FastAPI(title="Local AI Companion API")
 
-# CORS is not authentication. Keep this list restricted to sites you control.
-# Replace the GitHub Pages example with your real username and repository.
 ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
@@ -39,26 +68,44 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
+
+# --------------------------------------------------
+# AI runtime
+# --------------------------------------------------
+
 runtime = Runtime(root=ROOT)
 
+
+# --------------------------------------------------
+# Request models
+# --------------------------------------------------
 
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=10000)
 
+
+# --------------------------------------------------
+# Authentication
+# --------------------------------------------------
 
 def verify_token(
     authorization: str | None = Header(default=None),
 ):
     expected = f"Bearer {LOCAL_TOKEN}"
 
-    if not authorization or not secrets.compare_digest(
-        authorization, expected
+    if (
+        not authorization
+        or not secrets.compare_digest(authorization, expected)
     ):
         raise HTTPException(
             status_code=401,
             detail="Invalid or missing companion token.",
         )
 
+
+# --------------------------------------------------
+# API endpoints
+# --------------------------------------------------
 
 @app.get("/health")
 def health():
@@ -70,17 +117,15 @@ def chat(body: ChatRequest):
     try:
         reply = runtime.quick(body.message)
 
-        # The frontend expects a JSON object with a string named "reply".
-        if isinstance(reply, str):
-            answer = reply
-        else:
-            answer = str(reply)
+        answer = reply if isinstance(reply, str) else str(reply)
 
         return {"reply": answer}
 
     except Exception:
-        # Keep internal exception details out of the browser response.
         raise HTTPException(
             status_code=500,
-            detail="The local AI failed to generate a response. Check the companion terminal.",
+            detail=(
+                "The local AI failed to generate a response. "
+                "Check the companion terminal."
+            ),
         )

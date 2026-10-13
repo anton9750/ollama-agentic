@@ -1,0 +1,11 @@
+{
+  "ollama_host": "http://localhost:11434",
+  "default_model": "qwen2.5-coder",
+  "max_tool_rounds": 12,
+"enable_tools": false,
+"allow_shell": false,
+"auto_save_code": false,
+  "verify_after_write": true,
+  "verbose": true,
+  "color": true
+}
