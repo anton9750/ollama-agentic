@@ -1,1 +1,3 @@
-# Zero external dependencies required! Uses pure Python standard library.
+fastapi
+uvicorn
+pydantic
