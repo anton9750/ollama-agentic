@@ -11,7 +11,7 @@ HOST = "127.0.0.1"
 PORT = 8765
 
 # Replace these with your actual GitHub Pages URL.
-WEBSITE_URL = "http://127.0.0.1:5500/frontend/"
+WEBSITE_URL = "https://anton9750.github.io/ollama-agentic/"
 
 
 def main():
